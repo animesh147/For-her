@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Question for You ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.min.js" defer></script> 
+    
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            overflow-y: auto;
+            animation: backgroundGradient 15s ease infinite alternate;
+            cursor: default;
+        }
+
+        /* Background Gradient Animation */
+        @keyframes backgroundGradient {
+            0% { background: linear-gradient(135deg, #f0f0f0, #e0e0e0); }
+            50% { background: linear-gradient(135deg, #e0f0f0, #d0e0e0); }
+            100% { background: linear-gradient(135deg, #f0f0f0, #e0e0e0); }
+        }
+
+        /* Card container */
+        .card-container {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+            max-width: 550px;
+            width: 90%;
+            position: relative;
+            z-index: 1; /* Card is above falling elements */
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+            transform: scale(0.95);
+            opacity: 0;
+            animation: cardShadowPulse 5s ease-in-out infinite alternate;
+        }
+
+        .card-container.loaded {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        @keyframes cardShadowPulse {
+            0% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
+            100% { box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); }
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            color: #ff6f61;
+            margin-bottom: 30px;
+            font-size: 2.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            font-weight: bold;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(135deg, var(--start-color), var(--end-color));
+            background-size: 200% 200%;
+            animation: gradientShift 6s ease infinite alternate;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Ripple effect for buttons */
+        .button:after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.7) 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .6s, opacity 1.2s;
+        }
+
+        .button:active:after {
+            transform: scale(0, 0);
+            opacity: .4;
+            transition: 0s;
+        }
+
+        #yesButton {
+            --start-color: #6edc6e;
+            --end-color: #4CAF50;
+            color: white;
+        }
+
+        #yesButton:hover {
+            background-color: #45a049;
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        #noButton {
+            --start-color: #ff8080;
+            --end-color: #f44336;
+            color: white;
+            position: relative;
+            transition: all 0.8s ease-out;
+            will-change: transform, opacity;
+        }
+
+        #noButton.fly-away {
+            transform: translateX(800px) translateY(-600px) rotate(180deg) scale(0);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Message container */
+        .message-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ffebee;
+            border-radius: 10px;
+            border: 2px solid #ff6f61;
+            display: none;
+            font-size: 1.1em;
+            color: #333;
+            line-height: 1.6;
+            text-align: left;
+            position: relative;
+            max-height: 400px;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .message-container.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .message-container p {
+            margin-bottom: 1em;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .message-container p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Custom scrollbar for Webkit browsers (Chrome, Safari, Edge) */
+        .message-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .message-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .message-container::-webkit-scrollbar-thumb {
+            background: #ff6f61;
+            border-radius: 10px;
+        }
+
+        .message-container::-webkit-scrollbar-thumb:hover {
+            background: #e05a50;
+        }
+
+        /* Heart background animation */
+        .heart-bg {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 6em;
+            color: rgba(255, 105, 180, 0.15);
+            z-index: 0;
+            animation: pulse 2s infinite alternate, spin 10s linear infinite;
+            transform-origin: center;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Music control button */
+        #musicToggleButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #6a0572;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            font-size: 1.6em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        #musicToggleButton:hover {
+            background-color: #9205A5;
+            transform: scale(1.1);
+        }
+
+        #musicToggleButton.playing {
+            background-color: #008000;
+        }
+
+        #musicToggleButton.playing:hover {
+            background-color: #006400;
+        }
+
+        /* Falling elements animation */
+        .falling-element {
+            position: absolute;
+            background-color: transparent;
+            font-size: 2.5em; /* Larger emojis */
+            pointer-events: none;
+            animation: fall linear forwards;
+            opacity: 0;
+            z-index: 0; /* Changed z-index to be behind the card but above background */
+            transform-origin: center;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+            5% { opacity: 1; } /* Fade in faster */
+            95% { opacity: 1; } /* Stay visible longer */
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } /* Fall further, spin more */
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <h1>Do you love me?</h1>
+        <div class="buttons-container">
+            <button id="yesButton" class="button">Yes! ❤️</button>
+            <button id="noButton" class="button">No 💔</button>
+        </div>
+        <div id="specialMessage" class="message-container">
+            <span class="heart-bg">❤️</span>
+            <p class="msg-paragraph">My dearest love,</p>
+            <p class="msg-paragraph">Thank you for saying yes to the question. I want you to know that I love you a lot too and I really wish I could do a lot of other things for you. However, this distance doesn't allow me to, still I promise you that I will try my best. </p>
+            <p class="msg-paragraph">It has been more than 4 years baby and these 4 years have been so special to me. I never felt this loved and cared but because of you I feel the luckiest person ever. What you have done for me all these years is something remarkable and I am forever grateful for that.</p>
+            <p class="msg-paragraph">I might not have been good to you always. I have hurt you several times. I have made you cry a million times already and I regret each and every time that your eyes had to shed tears because of me or my actions. These past few months have been so difficult for us and our relationship but you never lost hope. Thank you so much for always believing in me. Thank you for always loving me despite my issues. I have not been good to you at all but I promise you that I will try my ultimate best to make up for all those times that I made you cry.</p>
+            <p class="msg-paragraph">I might have been jealous with a lot of things. Its just that I feel disheartened that I am not around you, I am not being able to go to places with you, I am not being able to touch you or feel you but others can. Everytime I just get reminded of the times we spent together at Utpala, Bamboo or every places we went after your college. And because of that I start getting jealous. I know its wrong maya and I will change myself in this. I know it doesn't work this way and I need to change and I will for us. I am really sorry for all these times when I hurt you because of my overthinking or jealousy.</p>
+            <p class="msg-paragraph">I want you to know that you have always been my greatest strength. You have always been my greatest supporter. Hurting you makes me fill with guilt. I wish I could change everything and be a better boyfriend. Maybe I have not been able to be so until now but I promise you that I will change and be a good boyfriend and even a better husband and a father.</p>
+            <p class="msg-paragraph">Every day, every single minute all I think about is you and our future together. You, me, rolo and our beautiful little kids. This is what I always dream of and I promise that I will try my best to fulfill this dream of ours.</p>
+            <p class="msg-paragraph">Now, just a few months away and I will be right there wrapped around your arms and I really look forward to it. I can't wait to see you and be there in your arsms. I am really really excited for it. We will have so much fun and have the best time of our life. I promise to fulfill all your expectations and give you a lot of happiness, actually infinite happiness.</p>
+            <p class="msg-paragraph">As we move into the future together, I hope our relationship will only get stronger and stronger every day. I hope we can be more open to each other and share our feelings freely with each other. It will only strengthen our relationship mutu.</p>
+            <p class="msg-paragraph">I want us to promise that from now on we will always try our best to avoid fighting with each other. It only hurts us and our realtionship maya. There is nothing good in it. So, please lets promise each other to never fight again. Whenever we argue or fight, I get completely broken from inside maya and its so hard to do anything. Arguing with you or having a fight with you is the last ever thing I want especially when we are not physically together. So, lets promise each other that we will try our best to avoid it.</p>
+            <p class="msg-paragraph">Finally, I want you to understand how special you are to me. Although I used AI to code this and all, but this message I wrote is from the bottom of my heart. This might not be such a big thing but I just wanted to express how special you are to me. I hope you will understand my feelings for you. I really love you a lot baby. I reallyyy reallyyyyyyy loveeeee youuu a lottttttt.❤️</p>
+            <p class="msg-paragraph">Forever yours ,</p>
+            <p class="msg-paragraph">Your Anymuuuuuuu</p>
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="your-music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <button id="musicToggleButton">🎵</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.min.js" defer></script>
+    
+    <script>
+        const yesButton = document.getElementById('yesButton');
+        const noButton = document.getElementById('noButton');
+        const specialMessage = document.getElementById('specialMessage');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const musicToggleButton = document.getElementById('musicToggleButton');
+        const cardContainer = document.querySelector('.card-container');
+        const messageParagraphs = document.querySelectorAll('.msg-paragraph');
+
+        let messageShown = false;
+        let jsConfetti;
+
+        // --- Performance/Management for Falling Elements ---
+        const maxFallingElements = 80; // Limit the total number of falling elements
+        const fallingEmojis = ['❤️', '✨', '💖', '💌', '💞', '🌟', '😊', '🌸', '💫']; // Emojis to drop
+        let fallingElementsInterval; // Variable to hold the interval ID
+
+        // --- Initial Load Animation & Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOMContentLoaded fired. Attempting to show card.");
+            cardContainer.classList.add('loaded');
+            
+            if (typeof JSConfetti !== 'undefined') {
+                jsConfetti = new JSConfetti();
+                console.log("JSConfetti initialized.");
+            } else {
+                console.error("JSConfetti library not loaded. Confetti effect will not work.");
+            }
+
+            backgroundMusic.play().then(() => {
+                console.log("Music autoplayed successfully.");
+                musicToggleButton.classList.add('playing');
+                musicToggleButton.textContent = '⏸️';
+            }).catch(error => {
+                console.warn("Music autoplay prevented by browser:", error);
+                musicToggleButton.classList.remove('playing');
+                musicToggleButton.textContent = '🎵';
+                musicToggleButton.title = "Click to play music!";
+            });
+
+            // Start continuous falling emojis
+            startContinuousFallingEmojis();
+        });
+
+        // --- Event Listeners ---
+        yesButton.addEventListener('click', () => {
+            console.log("Yes button clicked.");
+            if (!messageShown) {
+                specialMessage.classList.add('show');
+                messageShown = true;
+                playMusic();
+
+                // Trigger a *burst* of confetti on click (separate from continuous background)
+                if (jsConfetti) {
+                    jsConfetti.addConfetti({
+                        emojis: ['💖', '✨', '🌸', '💘', '💕', '🎉', '🌟'], // Add more celebratory emojis
+                        confettiNumber: 200, // More confetti for a burst
+                        confettiRadius: 8,
+                        dropHeight: 1.5,
+                    });
+                } else {
+                    console.warn("Confetti effect skipped: JSConfetti not available.");
+                }
+
+                // Animate paragraphs
+                messageParagraphs.forEach((p, index) => {
+                    setTimeout(() => {
+                        p.style.opacity = 1;
+                        p.style.transform = 'translateY(0)';
+                    }, 200 * index);
+                });
+            }
+        });
+
+        noButton.addEventListener('click', () => {
+            console.log("No button clicked.");
+            noButton.classList.add('fly-away');
+        });
+
+        musicToggleButton.addEventListener('click', () => {
+            console.log("Music toggle clicked.");
+            if (backgroundMusic.paused) {
+                playMusic();
+            } else {
+                pauseMusic();
+            }
+        });
+
+        // --- Music Functions ---
+        function playMusic() {
+            backgroundMusic.play().then(() => {
+                console.log("Music now playing.");
+                musicToggleButton.classList.add('playing');
+                musicToggleButton.textContent = '⏸️';
+            }).catch(error => {
+                console.error("Failed to play music:", error);
+            });
+        }
+
+        function pauseMusic() {
+            backgroundMusic.pause();
+            console.log("Music paused.");
+            musicToggleButton.classList.remove('playing');
+            musicToggleButton.textContent = '🎵';
+        }
+
+        // --- Function to start continuous falling emojis ---
+        function startContinuousFallingEmojis() {
+            // Clear any existing interval to prevent duplicates if called multiple times
+            if (fallingElementsInterval) {
+                clearInterval(fallingElementsInterval);
+            }
+
+            fallingElementsInterval = setInterval(() => {
+                const currentFallingElements = document.querySelectorAll('.falling-element').length;
+
+                // Only create new elements if we're below the maximum limit
+                if (currentFallingElements < maxFallingElements) {
+                    // Create 1 to 3 new falling elements at a time
+                    const numToCreate = Math.floor(Math.random() * 3) + 1;
+                    triggerFallingElements(fallingEmojis, numToCreate);
+                }
+            }, 1000); // Create new emojis every 1 second (adjust as needed)
+        }
+
+        // --- Falling Elements Function (now called continuously) ---
+        function triggerFallingElements(emojis, count) {
+            // console.log(`Creating ${count} falling elements.`); // Uncomment for debugging
+            const container = document.body;
+            for (let i = 0; i < count; i++) {
+                const element = document.createElement('div');
+                element.classList.add('falling-element');
+                element.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                // Randomize starting position more
+                element.style.left = Math.random() * 100 + 'vw';
+                element.style.top = `${-50 - Math.random() * 100}px`; /* Start slightly off-screen top */
+
+                // Randomize animation properties
+                element.style.animationDuration = (Math.random() * 5 + 8) + 's'; /* Longer duration for slower, more graceful fall (8-13s) */
+                element.style.animationDelay = (Math.random() * 5) + 's'; /* More varied stagger start times (0-5s) */
+                element.style.transform = `scale(${Math.random() * 0.7 + 0.3})`; /* Wider size range */
+                
+                container.appendChild(element);
+
+                // Remove element after its animation finishes to prevent DOM clutter
+                element.addEventListener('animationend', () => {
+                    element.remove();
+                });
+            }
+        }
+    </script>
+</body>
+</html>
